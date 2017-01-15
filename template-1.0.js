@@ -5,16 +5,19 @@ function Template(source) {
   function escaped(str) {
     var result = '';
     for (var i = 0; i < str.length; i++) {
-      var c = str[i];
-      if (c == '\\') {
-        result += '\\\\';
-      } else if (c == '"') {
-        result += '\\"';
-      } else if (c == '\n') {
-        result += '\\n';
-      } else {
-        result += c;
-      }
+      switch (str[i]) {
+        case '\\': {
+          result += '\\\\';
+        } break;
+        case '"': {
+          result += '\\"';
+        } break;
+        case '\n': {
+          result += '\\n';
+        } break;
+        default: {
+          result += str[i];
+        }
     }
     return result;
   }
