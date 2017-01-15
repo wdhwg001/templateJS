@@ -18,46 +18,40 @@ function Template(source) {
     }
     return result;
   }
-  var script = 'this.render = function(o){';
-  script += 'var out="";';
-  var len = source.length;
-  var i = 0;
+  var script = 'this.render = function(o){ var out="";',
+      len = source.length,
+      i = 0;
   while (i < len) {
     var str = '';
     // skip to <@
     while (i < len) {
-      if (source.substr(i, 2) == '<@') {
+      if (source.substr(i, 2) === '<@') {
         i += 2;
-        break;
+      } else {
+        str += source[i];
+        i++;
       }
-      str += source[i];
-      i++;
     }
     script += 'out+="' + escaped(str) + '";';
-    if (i == len)
-      break;
+    if (i === len) { break; }
     
     var foundExpr = false;
-    if (source[i] == '=') {
+    if (source[i] === '=') {
       foundExpr = true;
       i++;
-      if (i == len)
-        break;
-    }
-    
-    if (foundExpr) {
+      if (i === len) { break; }
       script += 'out+=';
     }
     
     // get until @>
     var str = '';
     while (i < len) {
-      if (source.substr(i, 2) == '@>') {
+      if (source.substr(i, 2) === '@>') {
         i += 2;
-        break;
+      } else {
+        str += source[i];
+        i++;
       }
-      str += source[i];
-      i++;
     }
     
     script += str;
