@@ -4,7 +4,7 @@
 function Template(source) {
   function escaped(str) {
     var result = '';
-    for (var i = 0; i < str.length; i++) {
+    for (var i = 0, _len = str.length; i < _len; i++) {
       var c = str[i];
       if (c == '\\') {
         result += '\\\\';
