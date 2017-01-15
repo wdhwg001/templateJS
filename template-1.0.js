@@ -3,69 +3,44 @@
 
 function Template(source) {
   function escaped(str) {
-    var result = '';
-    for (var i = 0; i < str.length; i++) {
-      var c = str[i];
-      if (c == '\\') {
-        result += '\\\\';
-      } else if (c == '"') {
-        result += '\\"';
-      } else if (c == '\n') {
-        result += '\\n';
-      } else {
-        result += c;
-      }
+    var result = str,
+        escapeList = [
+      ['\\', '\\\\'],
+      ['"', '\\"'],
+      ['\n', '\\n']
+    ];
+    for (var i = 0, _len = escapeList.length; i < _len; i++) {
+      result = ''.replace.apply(result, escapeList[i]);
     }
     return result;
   }
-  var script = 'this.render = function(o){';
-  script += 'var out="";';
-  var len = source.length;
-  var i = 0;
+  var script = 'this.render = function(o){ var out="";',
+      len = source.length,
+      i = 0;
   while (i < len) {
-    var str = '';
     // skip to <@
-    while (i < len) {
-      if (source.substr(i, 2) == '<@') {
-        i += 2;
-        break;
-      }
-      str += source[i];
-      i++;
+    var startPos = source.indexOf('<@',i);
+    startPos = (startPos === -1) ? len : startPos;
+    var preStr = source.slice(i, startPos);
+    if (preStr !== '') {
+      script += 'out+="' + escaped(preStr) + '";';
     }
-    script += 'out+="' + escaped(str) + '";';
-    if (i == len)
-      break;
+    i = startPos + 2;
     
-    var foundExpr = false;
-    if (source[i] == '=') {
-      foundExpr = true;
+    var isExpr = (source[i] === '=');
+    if (isExpr) {
       i++;
-      if (i == len)
-        break;
-    }
-    
-    if (foundExpr) {
-      script += 'out+=';
     }
     
     // get until @>
-    var str = '';
-    while (i < len) {
-      if (source.substr(i, 2) == '@>') {
-        i += 2;
-        break;
-      }
-      str += source[i];
-      i++;
-    }
+    var endPos = source.indexOf('@>', i);
+    endPos = (endPos === -1) ? len : endPos;
+    var tplStr = source.slice(i, endPos);
     
-    script += str;
-
-    if (foundExpr) {
-      script += ';';
+    if (tplStr !== '') {
+      script += isExpr ? 'out+=(' + tplStr + ');' : str;
     }
   }
   script += 'return out;}';
-  eval(script);
+  window.eval(script);
 }
