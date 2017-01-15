@@ -18,6 +18,7 @@ function Template(source) {
         default: {
           result += str[i];
         }
+      }
     }
     return result;
   }
